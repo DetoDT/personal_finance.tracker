@@ -3,7 +3,7 @@ import db
 
 ### Everything related to one time purchases ###
 
-categories: list[str] = ['spesa', 'games', 'sport', 'libri', 'cinesate', 'uni', 'altro']
+categories: list[str] = ['spesa', 'games', 'sport', 'libri', 'cinesate', 'uni', 'medicine', 'altro']
 
 class Transaction():
     def __init__(self, amount: float, category: int, date: date, description: str= ""):
@@ -75,7 +75,7 @@ def ask_description() -> str:
 # save transaction in db
 def save_transaction(amount: float, category: int, description: str = "") -> bool:
     today: date = date.today()
-    transaction: Transaction = Transaction(amount, category, today)
+    transaction: Transaction = Transaction(amount, category, today, description)
     new_transactions.append(transaction)
     if db.insert_transaction(amount, today, category, description) != -1:
         return True
@@ -88,4 +88,5 @@ def new_transaction() -> bool:
     cat: int = 0
     cat = ask_category()
     amount = ask_amount()
-    return save_transaction(amount, cat)
+    description = ask_description()
+    return save_transaction(amount, cat, description.strip())

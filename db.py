@@ -33,10 +33,11 @@ def insert_transaction(amount: float, date: date, category: int, description: st
         INSERT INTO transactions (amount, date, category, description)
                     values (?, ?, ?, ?)
                     ''', (amount, date, category, description))
+        conn.commit()
         id = cursor.lastrowid
     except Exception as err:
-        print("Error inserting new transaction")
-        return -1
+        print(f'Error inserting new transaction: {err}')
+        id = -1
 
     cursor.close() 
     conn.close()
@@ -44,7 +45,23 @@ def insert_transaction(amount: float, date: date, category: int, description: st
         return 0
     return id
 
-# todo
-def insert_recurring(amount: float, date: date, description: str):
-    return True
+# insert recurring payment into db
+def insert_recurring(amount: float, date: date, description: str, recurrence: int = 1):
+    conn = sqlite3.connect(path)
+    cursor = conn.cursor()
+    try:
+        cursor.execute('''
+        INSERT INTO recurring (amount, date, description, recurrence)
+                    values (?, ?, ?, ?)
+                    ''', (amount, date, description, recurrence))
+        conn.commit()
+        id = cursor.lastrowid
+    except Exception as err:
+        print(f'Error inserting new transaction: {err}')
+        id = -1
 
+    cursor.close() 
+    conn.close()
+    if id is None:
+        return 0
+    return id
