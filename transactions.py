@@ -73,13 +73,14 @@ def ask_description() -> str:
     return desc.strip()
 
 # save transaction in db
-def save_transaction(amount: float, category: int) -> bool:
+def save_transaction(amount: float, category: int, description: str = "") -> bool:
     today: date = date.today()
     transaction: Transaction = Transaction(amount, category, today)
     new_transactions.append(transaction)
-    with open(f'transactions/{today.strftime('%Y-%m')}.txt', 'a') as f:
-        f.write(f'{transaction.get_date()} {transaction.get_amount():.2f} {transaction.get_category()}\n')
-    return True
+    if db.insert_transaction(amount, today, category, description) != -1:
+        return True
+    return False
+    
 
 # begin a new transaction
 def new_transaction() -> bool:

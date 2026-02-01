@@ -3,7 +3,9 @@ from datetime import date, datetime
 
 ### Data center ###
 
-conn = sqlite3.connect('db/data.db')
+path = 'db/data.db'
+
+conn = sqlite3.connect(path)
 cursor = conn.cursor()
 cursor.execute("""
                CREATE TABLE IF NOT EXISTS transactions (
@@ -23,6 +25,26 @@ cursor.execute("""
 conn.commit()
 conn.close()
 
+def insert_transaction(amount: float, date: date, category: int, description: str='') -> int:
+    conn = sqlite3.connect(path) 
+    cursor = conn.cursor()
+    try:
+        cursor.execute('''
+        INSERT INTO transactions (amount, date, category, description)
+                    values (?, ?, ?, ?)
+                    ''', (amount, date, category, description))
+        id = cursor.lastrowid
+    except Exception as err:
+        print("Error inserting new transaction")
+        return -1
+
+    cursor.close() 
+    conn.close()
+    if id is None:
+        return 0
+    return id
+
 # todo
 def insert_recurring(amount: float, date: date, description: str):
     return True
+
