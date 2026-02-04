@@ -3,17 +3,16 @@ import db
 import transactions
 import recurring
 from transactions import Transaction
+import sys
 
 actions: str = 'arpq'
 
-def welcome():
-    print("Personal Expense Tracker")
-    print("Select action")
+def help():
+    print("Usage:")
+    print("Select an action by adding the letter on the same line")
     print("a: add new transaction")
     print("m: add monthly recurring payment")
-    print("r: add recurring payment every x months")
     print("p: print monthly stats")
-    print("q: quit")
 
 def ask_action() -> str:
     action = ''
@@ -24,24 +23,28 @@ def ask_action() -> str:
         print("try again")
 
 def main():
-    welcome()
-   
-    while True:
-        print('-------')
-        action: str = ask_action()
-        match action:
-            case 'a': # new transaction
-                transactions.new_transaction()
-            case 'r': # new recurring
-                recurring.new_recurring()
-            case 'p': # print stats
-                print() # todo
-                exit()
-            case 'q': # quit
-                exit()
-            case '_':
-                print()
-                exit()
+    # welcome()
+    if len(sys.argv) <= 1:
+        help()
+        exit()
+
+    action = sys.argv[1]
+    match action:
+        case 'a': # new transaction
+            transactions.new_transaction()
+        case 'r': # new recurring
+            recurring.new_recurring()
+        case 'p': # print stats
+            print(transactions.get_total_amount_month())
+            exit()
+        case 'h':
+            help()
+            exit()
+        case 'q': # quit
+            exit()
+        case '_':
+            print()
+            exit()
 
 if __name__=='__main__':
     main()

@@ -1,5 +1,6 @@
 from datetime import date, datetime
 import db
+import sqlite3
 
 ### Everything related to one time purchases ###
 
@@ -80,7 +81,6 @@ def save_transaction(amount: float, category: int, description: str = "") -> boo
     if db.insert_transaction(amount, today, category, description) != -1:
         return True
     return False
-    
 
 # begin a new transaction
 def new_transaction() -> bool:
@@ -90,3 +90,11 @@ def new_transaction() -> bool:
     amount = ask_amount()
     description = ask_description()
     return save_transaction(amount, cat, description.strip())
+
+def get_total_amount_month(date: date=date.today()) -> float:
+    transactions: list[sqlite3.Row] = db.get_month_transactions(date)
+    total: float = 0.0
+    for t in transactions:
+        total += t['amount']
+    return total
+

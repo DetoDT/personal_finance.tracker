@@ -13,6 +13,7 @@ cursor.execute("""
                amount FLOAT NOT NULL,
                category INTEGER NOT NULL,
                date TEXT NOT NULL,
+               month_and_year TEXT NOT NULL,
                description TEXT)
 """)
 
@@ -30,9 +31,9 @@ def insert_transaction(amount: float, date: date, category: int, description: st
     cursor = conn.cursor()
     try:
         cursor.execute('''
-        INSERT INTO transactions (amount, date, category, description)
-                    values (?, ?, ?, ?)
-                    ''', (amount, date, category, description))
+        INSERT INTO transactions (amount, date, month_and_year, category, description)
+                    values (?, ?, ?, ?, ?)
+                    ''', (amount, date, date.strftime('%Y-%m'), category, description))
         conn.commit()
         id = cursor.lastrowid
     except Exception as err:
@@ -65,3 +66,21 @@ def insert_recurring(amount: float, date: date, description: str, recurrence: in
     if id is None:
         return 0
     return id
+
+def get_month_transactions(month:date) -> list[sqlite3.Row]:
+    conn = sqlite3.connect(path)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    query = '''
+        SELECT * FROM transactions WHERE month_and_year=?'''
+    try:
+        cursor.execute(query, (str(month.strftime('%Y-%m')),))
+        conn.commit()
+        output = cursor.fetchall()
+    except Exception as err:
+        print(f'Error retrieving data: {err}')
+        return []
+    cursor.close()
+    conn.close()
+    return output
+
